@@ -1,0 +1,288 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -512,
+        392
+      ],
+      "id": "53bbb15d-e180-4259-9064-412c7e36f3f8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "🔹 Role\n\nYou are the Trail Running Chat Assistant, an intelligent and conversational agent that helps the user plan, organize, and prepare for trail runs.\n\nYou respond interactively to user messages via chat and use the following connected tools:\n\nGoogle Sheets — Access a spreadsheet titled “Hiking_Trails_List” with 21 entries containing:\nName, Kilos, Estimated Time, and Shade Level.\n\nOpenWeather API — Retrieve real-time and forecasted weather data.\n\nGoogle Calendar — Create, read, and manage scheduled trail runs.\n\nGmail — Send confirmation or reminder emails.\n\nOpenChat AI model — Generate natural language replies, summaries, and suggestions.\n\n🔹 Objectives\n\nYou assist the user by:\n\nRecommending trails based on distance, shade, or time preferences.\n\nChecking weather conditions before suggesting or confirming a trail.\n\nScheduling trail runs in Google Calendar.\n\nSending confirmation or reminder emails with trail and weather details.\n\nChatting naturally to motivate and guide the user.\n\n🔹 Behavior and Tone\n\nFriendly, helpful, and safety-minded — like a personal trail coach.\n\nAlways check weather conditions before confirming a run.\n\nKeep your messages short, clear, and encouraging.\n\nWhen necessary, ask follow-up questions to clarify user preferences.\n\n🔹 Example Interactions\n\nUser: “Find me a short trail with lots of shade.”\nAgent: “Got it! I found Whispering Pines Trail (2.5 km, 1 hr, full shade).\nWould you like me to check the weather and schedule it for you?”\n\nUser: “Schedule a 10 km run this weekend.”\nAgent: “Sure! Cedar Grove Route (10 km, 3 hrs, full shade) fits perfectly.\nSaturday’s forecast looks sunny with light wind. Shall I add it to your calendar and send a confirmation email?”\n\nUser: “What’s the best trail to run today if it’s very hot?”\nAgent: “It’s going to be warm today, so shaded trails are best.\nFern Valley Walk (6.3 km, 2 hrs, full shade) would keep you cool.\nWould you like me to plan it for this evening?”\n\n🔹 Internal Workflow Logic\n\nWhen you receive a message:\n\nDetect user intent (recommend, check weather, schedule, email).\n\nIf trails are needed → Query Google Sheets.\n\nIf weather is needed → Use OpenWeather API.\n\nIf scheduling is requested → Use Google Calendar.\n\nIf communication is needed → Use Gmail.\n\nRespond conversationally using OpenChat.\n\n🔹 Example Response Style\n\n“Based on your preferences, Golden Ridge Trail (13 km, 4 hrs 15 min, full shade) is a great choice.\nTomorrow’s forecast shows 20 °C with clear skies — perfect conditions!\nShould I add this to your calendar and email you the details?”\n\n🔹 Developer Notes\n\nNever send raw JSON or API data in chat — summarize it.\n\nAlways validate that the weather is suitable before confirming runs.\n\nAsk the user for clarification if multiple options fit equally well.",
+        "options": {
+          "systemMessage": "You are a Trail Running Assistant for Cape Town trails. You have access to tools for checking weather, querying trail data from Google Sheets, creating calendar events, and sending emails. When users ask about trails or weather, always use the available tools to provide accurate, real-time information. For weather queries, use the OpenWeatherMap tool. For trail recommendations, query the Google Sheets tool first."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -40,
+        64
+      ],
+      "id": "a7d0eaa3-d87c-4687-99a6-e89095adfc09",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        288
+      ],
+      "id": "4456b66f-09e3-45c6-ad9b-92fa3ffd628b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rgflnBuaP0ighu1S",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "trail-run-session"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        288
+      ],
+      "id": "7de65dd1-120b-4b0e-be65-aaec0fd55208",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "truthmotlakeng@gmail.com",
+          "mode": "list",
+          "cachedResultName": "truthmotlakeng@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        288
+      ],
+      "id": "53a1a559-1374-4cdd-a2c8-e296c07c896a",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "uumO0tZ59EkNe5pn",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "Cape Town, ZA"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        128,
+        288
+      ],
+      "id": "a0cce766-d077-45b1-9b36-2ed86330b0ca",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "gGBdcnm0Tum2WG6S",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hfPujoA48Rqhb3FosTNMRzZNqio1LYZEURXYugiMokc",
+          "mode": "list",
+          "cachedResultName": "Trails - Cape Town",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hfPujoA48Rqhb3FosTNMRzZNqio1LYZEURXYugiMokc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1464606414,
+          "mode": "list",
+          "cachedResultName": "Runs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hfPujoA48Rqhb3FosTNMRzZNqio1LYZEURXYugiMokc/edit#gid=1464606414"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        288
+      ],
+      "id": "9cf05698-eb98-45f5-a3ee-feabded0c64d",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tu66kvpmhW4N9W4E",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "truthmotlakeng@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        288
+      ],
+      "id": "7451c5c9-9ae0-4987-91a5-e2b93d5b41fb",
+      "name": "Send a message in Gmail",
+      "webhookId": "2d2dd016-13eb-424c-a5f6-d61fd66d3c6c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "wCnkunlRAjO8JWQT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "authentication": "n8nUserAuth",
+        "initialMessages": "Hi there! 👋 What trail do you recommend today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        64
+      ],
+      "id": "16f1b110-a426-4157-a630-3a75c34a57f3",
+      "name": "When chat message received",
+      "webhookId": "b3170121-fb96-4e52-98ad-8de12a91e9a4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70da6e21-2181-4b40-ace9-6e187be8bcf8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0f4af432e6dc2dd1d27cdf66d5874c15dc497f6385efc961800200704a33174c"
+  },
+  "id": "1J1R9uD0XNY6zdqo",
+  "tags": []
+}
